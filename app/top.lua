@@ -85,6 +85,7 @@ function import_data(filename)
         local access = Access(parse(line));
         access:save();
 
+        split_hour(access,nil);
         cnt = cnt +1;
         print(cnt);
     end
@@ -221,37 +222,27 @@ function write_to_file(filename, top, total, startTime, endTime)
     io.close();
 end
 
-function split_hour()
-    local accessH = nil;        
---    for i,v in ipairs(all) do 
-    for i=1,10000000000 do
-        local v = Access:getById(i);
+function split_hour(access, accessH)
 
-        print(i);
-        if v == nil then 
-            break;
-        end
+    local t = os.date("*t",access.time);
+    t.year = tostring(t.year);
+    t.month = tostring(t.month);
+    t.day = tostring(t.day);
+    t.hour = tostring(t.hour);
 
-        local t = os.date("*t",v.time);
-        t.year = tostring(t.year);
-        t.month = tostring(t.month);
-        t.day = tostring(t.day);
-        t.hour = tostring(t.hour);
-
-        if accessH == nil or accessH.year ~= (t.year) 
-            or accessH.month ~= (t.month) or accessH.day ~= (t.day) 
-            or accessH.hour ~= (t.hour) then
-            accessH = AccessHour:filter({year=(t.year), month=(t.month), 
-                                        day=(t.day), hour=(t.hour)})[1];
-        end
-
-        if accessH == nil then
-            accessH = AccessHour(t);
-            accessH:save();
-        end
-
-        accessH:addForeign("accesses", v);
+    if accessH == nil or accessH.year ~= (t.year) 
+        or accessH.month ~= (t.month) or accessH.day ~= (t.day) 
+        or accessH.hour ~= (t.hour) then
+        accessH = AccessHour:filter({year=(t.year), month=(t.month), 
+                                    day=(t.day), hour=(t.hour)})[1];
     end
+
+    if accessH == nil then
+        accessH = AccessHour(t);
+        accessH:save();
+    end
+
+    accessH:addForeign("accesses", access);
 end
 
 --清除时段数据
