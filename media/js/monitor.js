@@ -1,27 +1,70 @@
 $(document).ready(function(){
-        $("#monitor_clear").click(function(){
+        $("#monitor_clear > button").click(function(){
+            var $input = $("#monitor_clear input");
+            var filename = $input.val();
+
+            if(!confirm("确定要清除这个时段[" + filename + "]的数据吗？"))
+                return;
             $.post("/clear/",
+                {hour:filename},
                 function(data){
                     if(data.success)
                         alert("操作成功");
                     else
-                        alert("Failed");
+                        alert("Failed " + data.text);
                 },
                 "json");
 
         });
 
-        $("#monitor_import button").click(function(){
+    //数据上传
+    var $element = $(document).find('.file-uploader')[0]; 
+    var uploader = new qq.FileUploaderBasic({
+        element:$element, 
+        action: '/upload/',
+        debug:false,
+        onSubmit:function(id,filename){
+            var str = "<div class='upload_info' fileid='" + id +"'>" + 
+                      "<span>0%</span>"+
+                      "</div>";
+            var $photo = $(str);
+            $photo.insertAfter($element);
+        },
+
+        onProgress:function(id,filename,loaded,total){
+            var key = ".upload_info[fileid=" + id + "]";
+            var $photo = $($element).parent().find(key);
+            var percent = loaded/total * 100;
+            percent = "" + percent + "%";
+            $photo.find("span").text(percent);
+        },
+
+        onComplete:function(id, filename, data){
+            if(data.success){
+                var key = ".upload_info[fileid=" + id + "]";
+                var $photo = $($element).parent().find(key);
+                $photo.remove();
+                alert("上传数据成功 " + "文件名:" + data.text);
+            }
+        }});
+
+    uploader._button = uploader._createUploadButton($element);
+        
+
+        $("#monitor_import >.import").click(function(){
             var $input = $("#monitor_import input");
-            console.log("xxx");
             var filename = $input.val();
+
+            if(!confirm("确定要导入数据文件[" + filename + "]吗？"))
+                return;
+
             $.post("/import/",
                 {filename:filename},
                 function(data){
                     if(data.success)
                         alert("成功(导入"+ data.cnt + "条数据)!");
                     else
-                        alert("Failed");
+                        alert("Failed " + data.text);
                 },
                 "json");
         });
