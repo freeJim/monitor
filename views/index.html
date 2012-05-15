@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1.1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=" "/>
+    <meta name="description" content=" "/>
+    <meta http-equiv="Content-Language" content="utf-8" />
+    
+    <script type="text/javascript" src="/media/js/jquery-1.5.min.js"></script>
+    <script type="text/javascript" src="/media/js/monitor.js"></script>
+
+    <link rel="stylesheet" style="text/css" href="/media/css/monitor.css" media="screen">
+
+    <script>
+    </script>
+    
+    <title> Monitor </title>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>欢迎使用monitor</h1>
+
+
+    <div id="monitor_import">
+        <input type="file" name="access">
+        <br>
+        <button type="button">导入数据</button>
+    </div>
+
+    <div id="monitor_clear">
+        <button type="button">清除数据</button>
+    </div>
+    <div id="monitor_top">
+        <input type="text" class="top_hour" value='{{os.date("%Y-%m-%d %H",nil)}}'>
+        <button id="top" type="button">TOP HOUR</button>
+        <button id="retop" type="button">RETOP HOUR</button>
+    </div>
+
+    <div id="monitor_day">
+        <input type="text" class="top_day" value='{{os.date("%Y-%m-%d",nil)}}'>
+        <button id="top_day" type="button">TOP DAY</button>
+    </div>
+    
+    <div id="monitor_detail">
+        <input type="text" class="detail_hour" value='{{os.date("%Y-%m-%d",nil)}}'>
+        <span>IP:</span>
+        <input type="text" class="detail_ip" value=''>
+        <button id="ip_detail" type="button">DETAIL IP</button>
+    </div>
+
+    <div id="monitor_result">
+        <div>"没有数据"</div>
+    </div>
+</div>
+    
+
+</body>
+</html>

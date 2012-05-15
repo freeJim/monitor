@@ -1,0 +1,26 @@
+<div>
+    <div>
+        <li>日期: {{strDay}} </li>
+        <li>总访问次数:{{dtotal}}</li>
+        <li>独立IP数：{{dipnum}}(小时累加）</li>
+    </div>
+
+    <table border="1">
+        <tr>
+            <th>时间</th>
+            <th>访问次数</th>
+            <th>独立IP数</th>
+            <th>最热IP</th>
+            <th>最热IP访问数</th>
+        </tr>
+        {% for i,v in ipairs(tops) do %}
+        <tr>
+                <td>{{v.hour}}</td>
+                <td>{{v.total}}</td>
+                <td>{{v.ipnum}}</td>
+                <td>{{v.topip}}</td>
+                <td>{{v.topcnt}}</td>
+         </tr>
+        {% end %}
+    </table>
+</div>

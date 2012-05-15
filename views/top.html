@@ -1,0 +1,23 @@
+<div>
+    <div>
+        <li>独立IP数: {{ipnum}} </li>
+        <li>访问次数: {{total}} </li>
+        <li>开始时间: {{startTime}} </li>
+        <li>结束时间: {{endTime}} </li>
+    </div>
+
+    <table border="1">
+        <tr>
+            <th>index</th>
+            <th>IP</th>
+            <th>COUNT</th>
+        </tr>
+        {% for i,v in ipairs(top) do %}
+        <tr>
+                <td>{{i}}</td>
+                <td>{{v.ip}}</td>
+                <td>{{v.cnt}}</td>
+         </tr>
+        {% end %}
+    </table>
+</div>

@@ -1,0 +1,36 @@
+<div>
+    <div>
+        <li>日期: {{strHour}} </li>
+        <li>访问次数:{{#records}}</li>
+        <li>IP：{{rip}}</li>
+    </div>
+
+    <table border="1">
+        <tr>
+            <th>index</th>
+            <th>host</th>
+            <th>rip</th>
+            <th>rport</th>
+            <th>time</th>
+            <th>method</th>
+            <th>version</th>
+            <th>status</th>
+            <th>size</th>
+            <th>url</th>
+        </tr>
+        {% for i,v in ipairs(records) do %}
+        <tr>
+                <td>{{i}}</td>
+                <td>{{v.host}}</td>
+                <td>{{v.rip}}</td>
+                <td>{{v.rport}}</td>
+                <td>{{os.date("%H:%M:%S",v.time)}}</td>
+                <td>{{v.method}}</td>
+                <td>{{v.version}}</td>
+                <td>{{v.status}}</td>
+                <td>{{v.size}}</td>
+                <td>{{v.url}}</td>
+         </tr>
+        {% end %}
+    </table>
+</div>
