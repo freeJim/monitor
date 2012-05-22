@@ -1,0 +1,27 @@
+{% print(sDay,eDay,tops); %}
+<div>
+    <div>
+        <li>日期: {{sDay}} ~ {{eDay}} </li>
+        <li>总访问次数:{{total7}}</li>
+        <li>独立IP数：{{ipnum7}}(天累加）</li>
+    </div>
+
+    <table border="1">
+        <tr>
+            <th>日期</th>
+            <th>访问次数</th>
+            <th>独立IP数</th>
+            <th>最热IP</th>
+            <th>最热IP访问数</th>
+        </tr>
+        {% for i,v in ipairs(tops) do %}
+        <tr>
+                <td>{{v.day}}</td>
+                <td>{{v.dtotal}}</td>
+                <td>{{v.dipnum}}</td>
+                <td>{{v.dtopip}}</td>
+                <td>{{v.dtopcnt}}</td>
+         </tr>
+        {% end %}
+    </table>
+</div>

@@ -51,7 +51,7 @@ $(document).ready(function(){
     uploader._button = uploader._createUploadButton($element);
         
 
-        $("#monitor_import >.import").click(function(){
+        $("#monitor_import button").click(function(){
             var $input = $("#monitor_import input");
             var filename = $input.val();
 
@@ -110,6 +110,23 @@ $(document).ready(function(){
             var day = $(this).parent().find("input").val();
             
             $.post("/topday/",
+                {day:day},
+                function(data){
+                    if(data.success){
+                        var $tops = $(data.htmls);
+                        $("#monitor_result").append($tops);
+                    }
+                    else
+                        alert("Failed");
+                },
+                "json");
+        });
+
+        $("#monitor_7 >#top_7").click(function(){
+            $("#monitor_result").children().remove();
+            var day = $(this).parent().find("input").val();
+            
+            $.post("/top7/",
                 {day:day},
                 function(data){
                     if(data.success){

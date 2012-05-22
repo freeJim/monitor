@@ -13,4 +13,5 @@ li {
 table,td,th{
     border-collapse:collapse;
     border: 1px solid gainsboro;
+    padding:0px 5px;
 }

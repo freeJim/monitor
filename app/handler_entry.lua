@@ -84,7 +84,6 @@ local  function topday(web,req)
         day.hour = i-1;
         local tmp,total,ipnum, topip, topcnt = Top.topday_hour(day);
         table.insert(tops,{hour=i-1, total=total, ipnum=ipnum, topip=topip, topcnt=topcnt });
-        print(total,ipnum);
         dtotal = dtotal + tonumber(total);
         dipnum = dipnum + tonumber(ipnum);
     end
@@ -92,6 +91,58 @@ local  function topday(web,req)
     web:json{
         success = true,
         htmls = View("topday.html"){"locals",strDay=req.PARAMS.day},
+    }
+end
+
+local  function top7(web,req)
+    local day = req.PARAMS.day;
+    day = Util.timeStr2Struct(day);
+
+    local time = os.time(day);
+    local sDay = os.date("*t",time - (7)*24*60*60);
+    day = os.date("*t",time-24*60*60);
+
+    local total7 = 0;
+    local ipnum7 = 0;
+    local tops = {};
+
+    for i=0,6 do 
+        local dtotal = 0;
+        local dipnum = 0;
+        local dtopip = "";
+        local dtopcnt = 0;
+        
+        local  thisDay = os.date("*t",time - (7-i)*24*60*60);
+
+        for i=1,24 do
+            thisDay.hour = i-1;
+            local tmp,total,ipnum, topip, topcnt = Top.topday_hour(thisDay);
+            dtotal = dtotal + tonumber(total);
+            dipnum = dipnum + tonumber(ipnum);
+
+            if topcnt > dtopcnt then 
+                dtopip = topip;
+                dtopcnt = topcnt;
+            end
+        end
+
+        local str=string.format("%d-%d-%d",thisDay.year,thisDay.month,thisDay.day);
+        table.insert(tops,{day=str, dtotal=dtotal, dipnum=dipnum, 
+                            dtopip=dtopip, dtopcnt=dtopcnt });
+
+        total7 = total7 + dtotal;
+        ipnum7 = ipnum7 + dipnum;
+    end
+
+    web:json{
+        success = true,
+        htmls = View("top7.html"){
+                    tops=tops,
+                    total7=total7,
+                    ipnum7=ipnum7,
+                    sDay=string.format("%d-%d-%d",sDay.year,sDay.month,sDay.day),
+                    eDay=string.format("%d-%d-%d",day.year,day.month,day.day),
+                },
     }
 end
 
@@ -124,6 +175,7 @@ URLS = {
     ['/top/'] = top,
     ['/retop/'] = retop,
     ['/topday'] = topday,
+    ['/top7'] = top7,
     ['/import/'] = import,
     ['/clear/'] = clear,
     ['/detail/'] = detail,

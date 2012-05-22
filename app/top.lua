@@ -45,6 +45,8 @@ function parse(record)
     s,e = string.find(record,":",start);
     len = tonumber(string.sub(record,start,s-1));
     t.time = string.sub(record,e+1,e+len);
+    --t.time = tonumber(t.time) + 8*60*60; 
+    --t.time = tostring(t.time);
 
     start = e+1 + len+1;
     s,e = string.find(record,":",start);
@@ -81,11 +83,12 @@ function import_data(filename)
     end
 
     local cnt = 0;
+    local accessH = nil
     for line in file:lines() do
         local access = Access(parse(line));
         access:save();
 
-        split_hour(access,nil);
+        accessH = split_hour(access,accessH);
         cnt = cnt +1;
         print(cnt);
     end
@@ -100,11 +103,9 @@ end
 
 --返回统计top100, 访问总次数，独立IP数
 function retop_hour(hour)
-    print("top_hour");
-    local accessH = AccessHour:filter({ year=tostring(hour.year), 
-                                        month=tostring(hour.month), 
-                                        day=tostring(hour.day), 
-                                        hour=tostring(hour.hour)})[1];
+    print("top_hour",hour.year,hour.month,hour.day,hour.hour);
+    hour = generate_hour_idx(hour);
+    local accessH = AccessHour:filter({ idx = hour.idx})[1];
     
     if accessH == nil then--没有访问数据 
         return {}, 0, 0, 0, 0;
@@ -151,10 +152,8 @@ end
 --返回统计top100, 访问总次数，独立IP数
 function top_hour(hour)
     print("top_hour");
-    local accessH = AccessHour:filter({ year=tostring(hour.year), 
-                                        month=tostring(hour.month), 
-                                        day=tostring(hour.day), 
-                                        hour=tostring(hour.hour)})[1];
+    hour = generate_hour_idx(hour);
+    local accessH = AccessHour:filter({idx = hour.idx })[1];
     
     if accessH == nil then 
         return retop_hour(hour);
@@ -171,12 +170,11 @@ end
 --返回统计top100, 访问总次数，独立IP数
 function topday_hour(hour)
     print("topday_hour");
-    local accessH = AccessHour:filter({ year=tostring(hour.year), 
-                                        month=tostring(hour.month), 
-                                        day=tostring(hour.day), 
-                                        hour=tostring(hour.hour)})[1];
+    hour = generate_hour_idx(hour);
+    local accessH = AccessHour:filter({ idx=hour.idx})[1];
     
-    if accessH == nil then 
+    if accessH==nil or accessH.ipnum==nil 
+        or accessH.topip==nil or accessH.topcnt==nil then 
         return retop_hour(hour);
     end
     
@@ -185,11 +183,8 @@ end
 
 function ip_detail(hour,rip)
     print("ipdetail",rip);
-
-    local accessH = AccessHour:filter({ year=tostring(hour.year), 
-                                        month=tostring(hour.month), 
-                                        day=tostring(hour.day), 
-                                        hour=tostring(hour.hour)})[1];
+    hour = generate_hour_idx(hour);
+    local accessH = AccessHour:filter({ idx=hour.idx})[1];
     
     if accessH == nil then 
         return {};
@@ -197,12 +192,16 @@ function ip_detail(hour,rip)
     
     local all = accessH:getForeign("accesses");
     local records = {};
+    if rip == nil or rip =="" then
+        return all;
+    end
+
     for i,v in ipairs(all) do
         if v.rip == rip then 
             table.insert(records,v);
         end
     end
-
+    
     return records;
 end
 
@@ -222,36 +221,63 @@ function write_to_file(filename, top, total, startTime, endTime)
     io.close();
 end
 
+function generate_hour_idx(tdate) 
+    if(type(tdate.year) == "number") then
+        tdate.year = tostring(tdate.year);
+    end
+
+    if(type(tdate.month) == "number") then
+        tdate.month = tostring(tdate.month);
+    end
+
+    if(type(tdate.day) == "number") then
+        tdate.day = tostring(tdate.day);
+    end
+
+    if(type(tdate.hour) == "number") then
+        tdate.hour = tostring(tdate.hour);
+    end
+
+    --std
+    if string.len(tdate.month) == 1 then 
+        tdate.month = "0"..tdate.month;
+    end
+    if string.len(tdate.day) == 1 then 
+        tdate.day = "0" .. tdate.day;
+    end
+    if string.len(tdate.hour) == 1 then
+        tdate.hour = "0" .. tdate.hour;
+    end
+
+    tdate.idx = tdate.year .. tdate.month .. tdate.day .. tdate.hour;
+
+    return tdate;
+end
+
 function split_hour(access, accessH)
-
     local t = os.date("*t",access.time);
-    t.year = tostring(t.year);
-    t.month = tostring(t.month);
-    t.day = tostring(t.day);
-    t.hour = tostring(t.hour);
+    t = generate_hour_idx(t);
 
-    if accessH == nil or accessH.year ~= (t.year) 
-        or accessH.month ~= (t.month) or accessH.day ~= (t.day) 
-        or accessH.hour ~= (t.hour) then
-        accessH = AccessHour:filter({year=(t.year), month=(t.month), 
-                                    day=(t.day), hour=(t.hour)})[1];
+    if accessH == nil or accessH.idx ~= t.idx then
+        accessH = AccessHour:filter({idx=t.idx})[1];
     end
 
     if accessH == nil then
         accessH = AccessHour(t);
+
         accessH:save();
     end
 
     accessH:addForeign("accesses", access);
+    return accessH;
 end
 
 --清除时段数据
 function hour_clear(hour)
     print("hour_clear");
-    local accessH = AccessHour:filter({ year=tostring(hour.year), 
-                                        month=tostring(hour.month), 
-                                        day=tostring(hour.day), 
-                                        hour=tostring(hour.hour)})[1];
+    hour = generate_hour_idx(hour);
+    ptable(accessH);
+    local accessH = AccessHour:filter({ idx=hour.idx})[1];
     
     if accessH == nil then 
         return false,"这个时段没有数据";

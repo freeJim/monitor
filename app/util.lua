@@ -98,6 +98,13 @@ function timeStr2Struct(timeStr)
     local t = string.split(timeStr," ");
 
     local sTime = {};
+
+    t[1] = t[1] or "0";
+    t[2] = t[2] or "0";
+    t[3] = t[3] or "0";
+    t[4] = t[4] or "0";
+    t[5] = t[5] or "0";
+    t[6] = t[6] or "0";
     sTime.year = tonumber(t[1]);
     sTime.month = tonumber(t[2]);
     sTime.day = tonumber(t[3]);

@@ -9,17 +9,18 @@ AccessHour = Model:extend {
     __tag = 'Bamboo.Model.AccessHour';
 	__name = 'AccessHour';
 	__desc = 'Abstract AccessHour node definition.';
---	__indexfd = 'title';
-	__use_rule_index = true;
+	__indexfd = 'idx';
+	__use_rule_index = false;
     __fields = {
+        ['idx']             = {},
 		['year'] 			= {},
 		['month'] 			= {},
 		['day'] 			= {},
 		['hour'] 			= {},
-		['total'] 			= {},--总的访问次数
-		['ipnum'] 			= {},--独立IP数
+		['total'] 			= {type="number"},--总的访问次数
+		['ipnum'] 			= {type="number"},--独立IP数
         ['topip']           = {},--访问最多的IP
-        ['topcnt']          = {},--访问最多IP的访问次数
+        ['topcnt']          = {type="number"},--访问最多IP的访问次数
 		['accesses'] 		= {foreign="Access",st="MANY"},
         ['top100']          = {foreign="IpCnt",st="MANY"},
 		['created_date'] 	= {},
@@ -33,6 +34,7 @@ AccessHour = Model:extend {
             return self 
         end
 		
+        self.idx = t.idx;
         self.year   = t.year;
         self.month    = t.month;
         self.day  = t.day;
@@ -48,6 +50,7 @@ AccessHour = Model:extend {
 
         print("----------- Start AccessHour -----------");
         print("id",self.id);
+        print("idx",self.idx);
         print("year",self.year);
         print("month",self.month);
         print("day",self.day);
