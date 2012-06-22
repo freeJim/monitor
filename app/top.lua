@@ -247,7 +247,7 @@ function generate_hour_idx(tdate)
         tdate.hour = "0" .. tdate.hour;
     end
 
-    tdate.idx = tdate.year .. tdate.month .. tdate.day .. tdate.hour ..tdate.min;
+    tdate.idx = tdate.year .. tdate.month .. tdate.day .. tdate.hour;
 
     return tdate;
 end
