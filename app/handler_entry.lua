@@ -95,6 +95,7 @@ local  function topday(web,req)
 end
 
 local  function top7(web,req)
+    local start = os.time();
     local day = req.PARAMS.day;
     day = Util.timeStr2Struct(day);
 
@@ -134,6 +135,7 @@ local  function top7(web,req)
         ipnum7 = ipnum7 + dipnum;
     end
 
+    print(start,os.time());
     web:json{
         success = true,
         htmls = View("top7.html"){
@@ -144,6 +146,7 @@ local  function top7(web,req)
                     eDay=string.format("%d-%d-%d",day.year,day.month,day.day),
                 },
     }
+    print("",os.time());
 end
 
 local function detail(web,req)

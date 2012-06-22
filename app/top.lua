@@ -77,22 +77,20 @@ function parse(record)
 end
 
 function import_data(filename)
-    local file = io.open("media/uploads/" .. filename,"r");
-    if file == nil then
-        return false,"no such file [".."media/uploads/"..filename.."]";
-    end
+    local file = "media/uploads/" .. filename;
+    local lines = read_file(file);
 
     local cnt = 0;
     local accessH = nil
-    for line in file:lines() do
+    for i,line in ipairs(lines) do
         local access = Access(parse(line));
         access:save();
 
-        accessH = split_hour(access,accessH);
+        --accessH = split_hour(access,accessH);
+        accessH = split_hour(access,nil);
         cnt = cnt +1;
         print(cnt);
     end
-    io.close(file);
 
     return true,cnt
 end
@@ -103,7 +101,7 @@ end
 
 --返回统计top100, 访问总次数，独立IP数
 function retop_hour(hour)
-    print("top_hour",hour.year,hour.month,hour.day,hour.hour);
+    print("retop_hour",hour.year,hour.month,hour.day,hour.hour);
     hour = generate_hour_idx(hour);
     local accessH = AccessHour:filter({ idx = hour.idx})[1];
     
@@ -151,7 +149,7 @@ end
 
 --返回统计top100, 访问总次数，独立IP数
 function top_hour(hour)
-    print("top_hour");
+    print("top_hour",hour.year,hour.month,hour.day,hour.hour);
     hour = generate_hour_idx(hour);
     local accessH = AccessHour:filter({idx = hour.idx })[1];
     
@@ -169,7 +167,7 @@ end
 
 --返回统计top100, 访问总次数，独立IP数
 function topday_hour(hour)
-    print("topday_hour");
+    print("topday_hour",hour.year,hour.month,hour.day,hour.hour);
     hour = generate_hour_idx(hour);
     local accessH = AccessHour:filter({ idx=hour.idx})[1];
     
@@ -249,7 +247,7 @@ function generate_hour_idx(tdate)
         tdate.hour = "0" .. tdate.hour;
     end
 
-    tdate.idx = tdate.year .. tdate.month .. tdate.day .. tdate.hour;
+    tdate.idx = tdate.year .. tdate.month .. tdate.day .. tdate.hour ..tdate.min;
 
     return tdate;
 end
@@ -257,6 +255,7 @@ end
 function split_hour(access, accessH)
     local t = os.date("*t",access.time);
     t = generate_hour_idx(t);
+    local accessH = accessH or nil;
 
     if accessH == nil or accessH.idx ~= t.idx then
         accessH = AccessHour:filter({idx=t.idx})[1];
@@ -264,7 +263,6 @@ function split_hour(access, accessH)
 
     if accessH == nil then
         accessH = AccessHour(t);
-
         accessH:save();
     end
 
@@ -275,7 +273,7 @@ end
 --清除时段数据
 function hour_clear(hour)
     print("hour_clear");
-    hour = generate_hour_idx(hour);
+    hour = aenerate_hour_idx(hour);
     ptable(accessH);
     local accessH = AccessHour:filter({ idx=hour.idx})[1];
     
@@ -290,3 +288,30 @@ function hour_clear(hour)
     return true;
 end
 
+-- Function that reads one profile file
+function read_file(file)
+
+	local profile
+
+	-- Check if argument is a file handle or a filename
+	if io.type(file) == "file" then
+		profile = file
+	else
+		-- Open profile
+		profile = io.open(file)
+	end
+
+	-- Table for storing each profile's set of lines
+	line_buffer = {}
+
+	-- Get all profile lines
+	local i = 1
+	for line in profile:lines() do
+		line_buffer[i] = line
+		i = i + 1
+    end
+
+	-- Close file
+	profile:close()
+	return line_buffer
+end

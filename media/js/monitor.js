@@ -5,6 +5,7 @@ $(document).ready(function(){
 
             if(!confirm("确定要清除这个时段[" + filename + "]的数据吗？"))
                 return;
+            $input.val("");
             $.post("/clear/",
                 {hour:filename},
                 function(data){

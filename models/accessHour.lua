@@ -10,9 +10,9 @@ AccessHour = Model:extend {
 	__name = 'AccessHour';
 	__desc = 'Abstract AccessHour node definition.';
 	__indexfd = 'idx';
-	__use_rule_index = false;
+	__use_rule_index = true;
     __fields = {
-        ['idx']             = {},
+        ['idx']             = {indexType="string"},
 		['year'] 			= {},
 		['month'] 			= {},
 		['day'] 			= {},
